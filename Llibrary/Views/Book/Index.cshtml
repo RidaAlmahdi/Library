@@ -1,0 +1,124 @@
+﻿<div class="container c-body" style="">
+    <div class="d-flex">
+        <div class="align-self-center mx-auto">
+            <button type="button" id="addBook" class="btn btn-primary">
+                Add Book 
+            </button>
+        </div>
+
+    </div>
+</div>
+<div class="modal fade" id="addBookModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add Book</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Name</span>
+                    </div>
+                    <input type="text" class="form-control" id="name" aria-label="Default" aria-describedby="inputGroup-sizing-default" required>
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Publish Date</span>
+                    </div>
+                    <input type="date" class="form-control" id="publishDate" aria-label="Default" aria-describedby="inputGroup-sizing-default" required>
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="categories">Category Perants</label>
+                    </div>
+                    <select class="custom-select" id="categories">
+                        <option selected>Choose...</option>
+                        @foreach (var category in ViewBag.bookCategorires)
+                        {
+                            <option value="@category.Id">@category.CategoryName</option>
+                        }
+
+                    </select>
+                </div>
+                
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="authors">Author</label>
+                    </div>
+                    <select class="custom-select" id="authors">
+                        <option  selected>Choose...</option>
+                        @foreach (var author in ViewBag.authors)
+                        {
+                            <option value="@author.Id">@author.Name</option>
+                        }
+
+                    </select>
+                </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="addBookAction" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    })
+
+    $('#addBook').click(function (event) {
+        $('#addBookModal').modal()
+
+    });
+
+    $('#addBookAction').click(function (event) {
+
+        var selectCategory = document.getElementById('categories');
+        var selectAuthor = document.getElementById('authors');
+
+
+        var sendDataxhr = new XMLHttpRequest();
+        sendDataxhr.open("POST", "api/Book/AddBook", true);
+        sendDataxhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8');
+        sendDataxhr.onreadystatechange = function () {
+            if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Adding Book  successfully'
+                })
+            }
+            else {
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Adding Book  error'
+                })
+            }
+
+        };
+        sendDataxhr.send(JSON.stringify({
+            name: $('#name').val(),
+            publishDate: $('#publishDate').val(),
+            categoryId: parseInt(selectCategory.options[selectCategory.selectedIndex].value),
+            authorId: parseInt(selectAuthor.options[selectAuthor.selectedIndex].value),
+        }));
+
+
+
+    });
+</script>

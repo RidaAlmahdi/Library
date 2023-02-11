@@ -1,0 +1,72 @@
+﻿<div class="container c-body" style="">
+ <h5 class="modal-title pb-2" id="exampleModalLongTitle">Please Select Category</h5>
+        <div class="align-self-center mx-auto">
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                    <label class="input-group-text" for="categoryPerants">Category Parents</label>
+                </div>
+                <select class="custom-select" id="categoryPerants">
+                    <option value="-1" selected>Choose...</option>
+                    @foreach (var category in ViewBag.parentBookCategorires)
+                    {
+                        <option value="@category.Id">@category.CategoryName</option>
+                    }
+
+                </select>
+            </div>
+            <div class="input-group mb-3">
+                <div class="input-group-prepend">
+                <label class="input-group-text" for="categories">Categories</label>
+                </div>
+                <select class="custom-select" id="categories">
+                </select>
+            </div>
+        </div>
+
+    </div>
+
+
+<script>
+    document.addEventListener('input', function (event) {
+
+        // Only run on our select menu
+        if (event.target.id !== 'categoryPerants') return;
+
+        // The selected value
+        $('#categories')
+            .find('option')
+            .remove()
+           var categoriesSelect = document.getElementById('categories');
+
+            var restURL = "api/GetBookCategoryByParentId/" + event.target.value
+            var request = new XMLHttpRequest();
+
+            request.open('GET', restURL, true);
+            request.setRequestHeader('Content-type', 'application/json; charset=UTF-8');
+
+            request.onload = function () {
+                if (this.status >= 200 && this.status < 400) {
+               var data = JSON.parse(request.responseText);
+
+                for (var value of data) {
+
+                    categoriesSelect.options[categoriesSelect.options.length] = new Option(value.categoryName, value.id);
+
+                }
+
+                } else {
+                    // We reached our target server, but it returned an error
+                    alert("Server returned an error");
+                }
+            };
+
+            request.onerror = function () {
+                alert("Connection Error");
+            };
+
+            request.send();
+        
+
+    }, false);
+
+</script>

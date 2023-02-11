@@ -1,0 +1,108 @@
+﻿@using Library.DAL.Models;
+@model List<BookCategory>
+@{
+}
+<div class="container c-body" style="">
+    <div class="d-flex">
+        <div class="align-self-center mx-auto">
+            <button type="button" id="addBookCategory" class="btn btn-primary">
+                Add Book Category
+            </button>
+        </div>
+
+    </div>
+</div>
+<div class="modal fade" id="addBookCategoryModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalCenterTitle" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLongTitle">Add Book Category</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text" id="inputGroup-sizing-default">Category Name</span>
+                    </div>
+                    <input type="text" class="form-control" id="categoryName" aria-label="Default" aria-describedby="inputGroup-sizing-default">
+                </div>
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <label class="input-group-text" for="categoryPerants">Category Perants</label>
+                    </div>
+                    <select class="custom-select" id="categoryPerants">
+                        <option value="-1" selected>Choose...</option>
+                        @foreach (var category in ViewBag.parentBookCategorires)
+                        {
+                            <option value="@category.Id">@category.CategoryName</option>
+                        }
+
+                    </select>
+                </div>
+                
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="button" id="addBookCategoryAction" class="btn btn-primary">Save changes</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    const Toast = Swal.mixin({
+        toast: true,
+        position: 'top-end',
+        showConfirmButton: false,
+        timer: 3000,
+        timerProgressBar: true,
+        didOpen: (toast) => {
+            toast.addEventListener('mouseenter', Swal.stopTimer)
+            toast.addEventListener('mouseleave', Swal.resumeTimer)
+        }
+    })
+
+    $('#addBookCategory').click(function (event) {
+
+        $('#addBookCategoryModal').modal()
+
+    });
+
+    $('#addBookCategoryAction').click(function (event) {
+
+        var selectCategoryparent = document.getElementById('categoryPerants');
+             
+
+        var sendDataxhr = new XMLHttpRequest();
+        sendDataxhr.open("POST", "api/BookCategory/AddBookCategory", true);
+        sendDataxhr.setRequestHeader('Content-type', 'application/json; charset=UTF-8');
+        sendDataxhr.onreadystatechange = function () {
+            if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                Toast.fire({
+                    icon: 'success',
+                    title: 'Adding Book Category successfully'
+                })
+            }
+            else {
+                Toast.fire({
+                    icon: 'error',
+                    title: 'Adding Book Category error'
+                })
+            }
+
+        };
+
+        console.log( $('#categoryName').val())
+        console.log(selectCategoryparent.options[selectCategoryparent.selectedIndex].value)
+        sendDataxhr.send(JSON.stringify({
+            categoryName: $('#categoryName').val(),
+            perantId: parseInt(selectCategoryparent.options[selectCategoryparent.selectedIndex].value),
+        }));
+
+
+
+    });
+    </script>
